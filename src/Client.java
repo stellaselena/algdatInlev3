@@ -1,3 +1,7 @@
+import jdk.internal.org.objectweb.asm.tree.analysis.Value;
+
+import java.security.Key;
+
 public class Client {
 
     private static final Pakke PAKKE_A = new Pakke("java.util");
@@ -11,6 +15,8 @@ public class Client {
 
         Pakkeinfo pInfo = new Pakkeinfo();
 
+        pInfo.pakke2klasseMultimap();
+        pInfo.klasseImportsMultimap();
         linje();
 
 

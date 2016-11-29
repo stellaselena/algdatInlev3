@@ -1,39 +1,69 @@
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.HashSet;
 
 public class Pakkeinfo {
 
     /**
      * Returnerer en oversikt over hvilke klasser som hører
-     * til i ulike pakker, slik at 
-     *
-     *  `pakke2klasseMultimap().get(pakke)`
-     *
+     * til i ulike pakker, slik at
+     * <p>
+     * `pakke2klasseMultimap().get(pakke)`
+     * <p>
      * gir oss alle klassene som hører til i pakken `pakke`
      */
-    public Multimap<Pakke,Klasse> pakke2klasseMultimap(){
-        return new Multimap<Pakke,Klasse>();
+    public Multimap<Pakke, Klasse> pakke2klasseMultimap() {
+        Multimap<Pakke, Klasse> map = new Multimap<Pakke, Klasse>();
+        Pakke pakke = Pakke.ROOT;
+
+        for (Pakke p : pakke.undertre()) {
+
+            for (Klasse f : p.klasser()) {
+                map.put(p, f);
+            }
+        }
+
+        return map;
     }
 
     /**
      * Returnerer en oversikt over import mellom klasser, slik at
-     *
-     *   `klasseImportMultimap().get(klasse)`
-     * 
+     * <p>
+     * `klasseImportMultimap().get(klasse)`
+     * <p>
      * gir alle klasser som blir importert i klassen `klasse`
      */
-    public Multimap<Klasse,Klasse> klasseImportsMultimap(){
-        return new Multimap<Klasse,Klasse>();
+    public Multimap<Klasse, Klasse> klasseImportsMultimap() {
+
+        Multimap<Klasse, Klasse> map = new Multimap<Klasse, Klasse>();
+        Pakke pakke = Pakke.ROOT;
+
+
+        for (Pakke p : pakke.undertre()) {
+            TreeSet<Pakke> pakker = new TreeSet<>();
+            for (Klasse f : p.klasser()) {
+                for (Klasse x : f.imports()) {
+
+                    map.put(f, x);
+                }
+            }
+        }
+
+        return map;
     }
-    
+
     /**
      * Returnerer en oversikt over import mellom klasser, slik at
-     *
-     *   `inverseKlasseImportMultimap().get(klasse)`
-     * 
+     * <p>
+     * `inverseKlasseImportMultimap().get(klasse)`
+     * <p>
      * gir alle klasser som importerer klassen `klasse`
      */
-    public Multimap<Klasse,Klasse> inverseKlasseImportsMultimap(){
-        return new Multimap<Klasse,Klasse>();
+    public Multimap<Klasse, Klasse> inverseKlasseImportsMultimap() {
+
+        return new Multimap<Klasse, Klasse>();
     }
 
 
@@ -41,96 +71,116 @@ public class Pakkeinfo {
      * Returnerer et Iterable-objekt som gir tilgang
      * til alle klassen i en pakke.
      */
-    public Iterable<Klasse> klasser(Pakke pakke){
-        return Collections.emptyList();
+    public Iterable<Klasse> klasser(Pakke pakke) {
+
+        return this.pakke2klasseMultimap().get(pakke);
     }
 
     /**
      * Returnerer et Iterable-objekt som lar oss iterere
      * over pakker som blir direkte importert fra 'pakke'
+     *
+     * hhhhher må vi fortsette
      */
-    public Iterable<Pakke> directImports(Pakke pakke){
-        return Collections.emptyList();
+    public Iterable<Pakke> directImports(Pakke pakke) {
+        HashSet<Pakke> pakker = new HashSet<>();
+        Multimap<Klasse, Klasse>  ki =  this.klasseImportsMultimap();
+        Multimap<Pakke, Klasse>  pk =  this.pakke2klasseMultimap();
+        Iterator itr =klasser(pakke).iterator();
+            while (itr.hasNext()){
+                Iterator itr2 =ki.get((Klasse)itr.next()).iterator();
+                while(itr2.hasNext()){
+
+                    //(Klasse)itr2.next();
+
+                }
+
+            }
+
+        return  pakker;
     }
 
     /**
-     * Returnerer et Iterable objekt som lar oss iterere 
+     * Returnerer et Iterable objekt som lar oss iterere
      * over pakker som direkte eller indirekte blir importert fra
      * pakken 'pakke'.
      */
-    public Iterable<Pakke> directImporters(Pakke pakke){
+    public Iterable<Pakke> directImporters(Pakke pakke) {
         return Collections.emptyList();
     }
 
     /**
-     * Returnerer et Iterable-objekt som lar oss iterere over 
+     * Returnerer et Iterable-objekt som lar oss iterere over
      * pakker som brukes av 'pakke' (direkte eller indirekte).
      */
-    public Iterable<Pakke> allImports(Pakke pakke){
+    public Iterable<Pakke> allImports(Pakke pakke) {
         return Collections.emptyList();
     }
 
     /**
-     * Returnerer et Iterable objekt som lar oss iterere 
+     * Returnerer et Iterable objekt som lar oss iterere
      * over pakker som bruker pakken 'pakke' (direkte eller indirekte).
      */
-    public Iterable<Pakke> allImporters(Pakke pakke){
+    public Iterable<Pakke> allImporters(Pakke pakke) {
         return Collections.emptyList();
     }
-    
+
     /**
-     * returnerer '-1' hvis klasse b ikke bruker klasse b, 
+     * returnerer '-1' hvis klasse b ikke bruker klasse b,
      * returnerer '0' hvis klasse b er identisk med klasse a
      * returnerer '1' hvis klasse b bruker klasse a direkte, og
-     * ellers returnerer den det minimale antallet 
+     * ellers returnerer den det minimale antallet
      * imports som forbinder klassen a med klassen b, d.v.s. avstanden
      * mellom de to klassene i den rettede grafen av klasser
      * som importerer hverandre.
      */
-    public int distance(Klasse a, Klasse b){
+    public int distance(Klasse a, Klasse b) {
         return -1;
     }
 
     /**
      * Tilsv. som i metoden over, men det er en del av oppgaven å
-     * definere en menigsfull definisjon av 'avstanden' mellom 
-     * to pakker. 
-     *
+     * definere en menigsfull definisjon av 'avstanden' mellom
+     * to pakker.
+     * <p>
      * DEFINISJONEN SKRIVES INN HER:
-     *
-     * Det forutsettes at løsningen forholder seg til 
+     * <p>
+     * Det forutsettes at løsningen forholder seg til
      * den definisjonen som er valgt.
-     */ 
-    public int distance(Pakke a, Pakke b){
+     */
+    public int distance(Pakke a, Pakke b) {
         return -1;
     }
 
     /**
      * returnerer 'true' hvis det finnes sykliske importeringer
      * i javas standardbibliotek, d.v.s. om det finnes
-     *  pakker som gjensidig importerer hverandre 
+     * pakker som gjensidig importerer hverandre
      * (direkte eller indirekte).
-     *
+     * <p>
      * Hvis dette ikke er tilfellet returneres 'false'
-     *
+     * <p>
      * jfr læreboka s. 576
      */
-    public boolean hasCycle(){
+    public boolean hasCycle() {
         return true;
     }
 
     /**
      * Gir iterasjon over én kjede av sykliske
      * importeringer dersom det finnes en slik.
-     *
+     * <p>
      * Dersom det ikke forekommer syklisk
      * importering returners en tom liste.
-     *
+     * <p>
      * jfr læreboka s. 576
      */
-    public Iterable<Pakke> getCycle(){
+    public Iterable<Pakke> getCycle() {
         return Collections.emptyList();
     }
 
-    public static void main(String[] args){Client.main(args);}
+    public static void main(String[] args) {
+        Client.main(args);
+
+    }
 }
