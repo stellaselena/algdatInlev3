@@ -40,7 +40,6 @@ public class Pakkeinfo {
         Multimap<Klasse, Klasse> map = new Multimap<Klasse, Klasse>();
         Pakke pakke = Pakke.ROOT;
 
-
         for (Pakke p : pakke.undertre()) {
             TreeSet<Pakke> pakker = new TreeSet<>();
             for (Klasse f : p.klasser()) {
@@ -85,18 +84,14 @@ public class Pakkeinfo {
     public Iterable<Pakke> directImports(Pakke pakke) {
         HashSet<Pakke> pakker = new HashSet<>();
         Multimap<Klasse, Klasse>  ki =  this.klasseImportsMultimap();
-        Multimap<Pakke, Klasse>  pk =  this.pakke2klasseMultimap();
-        Iterator itr =klasser(pakke).iterator();
-            while (itr.hasNext()){
-                Iterator itr2 =ki.get((Klasse)itr.next()).iterator();
-                while(itr2.hasNext()){
 
-                    //(Klasse)itr2.next().;
+        for(Klasse kl : klasser(pakke)){
 
-                }
+            for(Klasse kl2 : ki.get(kl)){
+                pakker.add(kl.pakke());
 
             }
-
+        }
         return  pakker;
     }
 
@@ -106,6 +101,7 @@ public class Pakkeinfo {
      * pakken 'pakke'.
      */
     public Iterable<Pakke> directImporters(Pakke pakke) {
+
         return Collections.emptyList();
     }
 
