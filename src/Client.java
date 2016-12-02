@@ -4,7 +4,7 @@ import java.security.Key;
 
 public class Client {
 
-    private static final Pakke PAKKE_A = new Pakke("java.util");
+    private static final Pakke PAKKE_A = new Pakke("java.security");
     private static final Pakke PAKKE_B = new Pakke("java.awt");
 
 
@@ -21,13 +21,13 @@ public class Client {
 
 
         // OPPGAVE 1, Punkt b.
-
+/*
         System.out.printf("Pakken %s importerer følgende pakker direkte:%n",PAKKE_A);
         for(Pakke p: pInfo.directImports(PAKKE_A))
            System.out.println(p); 
 
         linje();
-        
+  */
         System.out.printf("Pakken %s blir direkte  importert i følgende pakker:%n",PAKKE_A);
         for(Pakke p: pInfo.directImporters(PAKKE_A))
            System.out.println(p); 

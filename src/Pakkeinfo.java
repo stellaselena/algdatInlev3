@@ -41,7 +41,6 @@ public class Pakkeinfo {
         Pakke pakke = Pakke.ROOT;
 
         for (Pakke p : pakke.undertre()) {
-            TreeSet<Pakke> pakker = new TreeSet<>();
             for (Klasse f : p.klasser()) {
                 for (Klasse x : f.imports()) {
 
@@ -55,14 +54,25 @@ public class Pakkeinfo {
 
     /**
      * Returnerer en oversikt over import mellom klasser, slik at
-     * <p>
-     * `inverseKlasseImportMultimap().get(klasse)`
-     * <p>
+     *
+     *   `inverseKlasseImportMultimap().get(klasse)`
+     *
      * gir alle klasser som importerer klassen `klasse`
      */
     public Multimap<Klasse, Klasse> inverseKlasseImportsMultimap() {
+        Multimap<Klasse, Klasse> map = new Multimap<Klasse, Klasse>();
+        Pakke pakke = Pakke.ROOT;
 
-        return new Multimap<Klasse, Klasse>();
+        for (Pakke p : pakke.undertre()) {
+            for (Klasse f : p.klasser()) {
+                for (Klasse x : f.imports()) {
+                    map.put(x, f);
+                }
+            }
+        }
+
+        return map;
+
     }
 
 
@@ -79,16 +89,14 @@ public class Pakkeinfo {
      * Returnerer et Iterable-objekt som lar oss iterere
      * over pakker som blir direkte importert fra 'pakke'
      *
-     * hhhhher må vi fortsette
      */
     public Iterable<Pakke> directImports(Pakke pakke) {
         HashSet<Pakke> pakker = new HashSet<>();
-        Multimap<Klasse, Klasse>  ki =  this.klasseImportsMultimap();
 
         for(Klasse kl : klasser(pakke)){
 
-            for(Klasse kl2 : ki.get(kl)){
-                pakker.add(kl.pakke());
+            for(Klasse kl2 : kl.imports()){
+                pakker.add(kl2.pakke());
 
             }
         }
@@ -97,17 +105,32 @@ public class Pakkeinfo {
 
     /**
      * Returnerer et Iterable objekt som lar oss iterere
-     * over pakker som direkte eller indirekte blir importert fra
-     * pakken 'pakke'.
+     * over pakker som importerer pakken 'pakke' direkte.
+     * (OBS: HER HAR JEG RETTET DOKUMENTASJONEN (LARS))
      */
     public Iterable<Pakke> directImporters(Pakke pakke) {
+        HashSet<Pakke> pakker = new HashSet<>();
+        Multimap<Klasse, Klasse> invers = this.inverseKlasseImportsMultimap();
+        for(Klasse kl : klasser(pakke)){
+            if(invers.get(kl) != null){
+                for(Klasse kl2: invers.get(kl)){
+                    pakker.add(kl2.pakke());
 
-        return Collections.emptyList();
+                }
+            }
+
+        }
+
+        return pakker;
     }
+
+    // All direkte importering over
+    // Nå indirekte importering
+
 
     /**
      * Returnerer et Iterable-objekt som lar oss iterere over
-     * pakker som brukes av 'pakke' (direkte eller indirekte).
+     * pakker som brukes (importeres) av 'pakke' (direkte eller indirekte).
      */
     public Iterable<Pakke> allImports(Pakke pakke) {
         return Collections.emptyList();
@@ -115,11 +138,13 @@ public class Pakkeinfo {
 
     /**
      * Returnerer et Iterable objekt som lar oss iterere
-     * over pakker som bruker pakken 'pakke' (direkte eller indirekte).
+     * over pakker som bruker (importerer) pakken 'pakke' (direkte eller indirekte).
      */
     public Iterable<Pakke> allImporters(Pakke pakke) {
         return Collections.emptyList();
     }
+
+    // NYTT KAPITTEL: Graf-algoritmer.
 
     /**
      * returnerer '-1' hvis klasse b ikke bruker klasse b,
@@ -138,9 +163,9 @@ public class Pakkeinfo {
      * Tilsv. som i metoden over, men det er en del av oppgaven å
      * definere en menigsfull definisjon av 'avstanden' mellom
      * to pakker.
-     * <p>
+     *
      * DEFINISJONEN SKRIVES INN HER:
-     * <p>
+     *
      * Det forutsettes at løsningen forholder seg til
      * den definisjonen som er valgt.
      */
@@ -151,11 +176,11 @@ public class Pakkeinfo {
     /**
      * returnerer 'true' hvis det finnes sykliske importeringer
      * i javas standardbibliotek, d.v.s. om det finnes
-     * pakker som gjensidig importerer hverandre
+     *  pakker som gjensidig importerer hverandre
      * (direkte eller indirekte).
-     * <p>
+     *
      * Hvis dette ikke er tilfellet returneres 'false'
-     * <p>
+     *
      * jfr læreboka s. 576
      */
     public boolean hasCycle() {
@@ -165,10 +190,10 @@ public class Pakkeinfo {
     /**
      * Gir iterasjon over én kjede av sykliske
      * importeringer dersom det finnes en slik.
-     * <p>
+     *
      * Dersom det ikke forekommer syklisk
      * importering returners en tom liste.
-     * <p>
+     *
      * jfr læreboka s. 576
      */
     public Iterable<Pakke> getCycle() {
