@@ -65,7 +65,7 @@ public class Pakke implements Comparable<Pakke> {
     }
 
     
-    // Private methods
+    // PRIVATE METODER
     
     private boolean isPakke(){return this.file.isDirectory();}
     
@@ -102,7 +102,7 @@ public class Pakke implements Comparable<Pakke> {
      * én felles long-representasjon.
      */
     public int compareTo(Pakke other){return this.file.compareTo(other.file);}
-    public boolean equals(Object other){return !(other instanceof Pakke) && this.file.equals(((Pakke)other).file);}
+    public boolean equals(Object other){return this == other || ((other instanceof Pakke) && this.file.equals(((Pakke)other).file));}
     public int hashCode(){return this.file.hashCode();}
     public String toString(){return file.getAbsolutePath().toString().substring(ROOT_PATH_LENGTH+1).replace(java.io.File.separatorChar,'.');}
 

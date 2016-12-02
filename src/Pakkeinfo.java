@@ -91,7 +91,7 @@ public class Pakkeinfo {
                 Iterator itr2 =ki.get((Klasse)itr.next()).iterator();
                 while(itr2.hasNext()){
 
-                    //(Klasse)itr2.next();
+                    //(Klasse)itr2.next().;
 
                 }
 
